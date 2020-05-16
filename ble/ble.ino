@@ -39,20 +39,17 @@ uint32_t sleep_tm = TIME_TO_SLEEP*uS_TO_mS_FACTOR;
 #define CHARACTERISTIC_UUID_TX "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 BLECharacteristic *pCharacteristic;
 
-//int attempt=0;
-char sl[7]; //To store all the time positions where slouch is detected
 
 /************************** Functions **************************/
 
 
-char tracking[]="RP+00.00@+00.00";
+
 void set_ble(){
   
-  pCharacteristic->setValue(tracking);
+  pCharacteristic->setValue("Device Connected");
     
     pCharacteristic->notify(); // Send the value to the app!
     Serial.print("*** Sent Value: ");
-    Serial.print(tracking);
     Serial.println(" ***");
     debugln("Data Sent!");
 }
@@ -101,33 +98,9 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
         // Do stuff based on the command received from the app
         if (rxValue.find("A") != -1) { 
-          txValue=1;
-          success=false;
-          status_on_off=true;
-          
+           debugln("A received");
         }
 
-        if (rxValue.find("B") != -1)  //OFF
-        {
-          int intermediate_sleep=120000*uS_TO_mS_FACTOR;
-          Serial.println("OFF string sent");
-          status_on_off = false;
-          //esp_sleep_enable_timer_wakeup(intermediate_sleep);
-          store_values();
-          delay(100);
-          //esp_deep_sleep_start();
-        }
-
-        if (rxValue.find("C") != -1)  //ON
-        {
-          status_on_off = true;
-          success=false;
-          Serial.println("Now in main loop");
-          Serial.println("ON string sent");
-          txValue=0;
-          esp_sleep_enable_timer_wakeup(0);
-          esp_deep_sleep_start();
-        }
       }
     }
 };
@@ -183,5 +156,5 @@ void setup() {
 
 /************************** Loop Code **************************/
 void loop() {  
-
+  set_ble();
 }
